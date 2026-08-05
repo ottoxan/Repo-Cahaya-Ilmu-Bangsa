@@ -62,8 +62,7 @@ class AdminPanelProvider extends PanelProvider
                 AuthUIEnhancerPlugin::make()
                     ->formPanelPosition('left')
                     ->emptyPanelBackgroundImageUrl(asset('assets/images/login.jpg'))
-                ->formPanelWidth('40%')
-                ,
+                    ->formPanelWidth('40%'),
             ])
             ;
     }
