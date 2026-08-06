@@ -45,7 +45,7 @@
 
     @stack('styles')
 </head>
-<body class="bg-[#F3E9DC] text-slate-800 min-h-screen flex flex-col selection:bg-slate-900 selection:text-white antialiased">
+<body class="text-slate-800 min-h-screen flex flex-col selection:bg-slate-900 selection:text-white antialiased">
 
     <!-- Fullscreen Book Loader Overlay -->
     <div id="page-preloader" 
