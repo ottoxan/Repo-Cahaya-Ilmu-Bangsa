@@ -73,6 +73,14 @@
 
     </div>
 
+    <!-- Back to Top Floating Button -->
+    <button id="back-to-top" aria-label="Kembali ke Atas"
+        class="fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-orange-600 text-white shadow-xl shadow-orange-600/30 opacity-0 pointer-events-none transition-all duration-300 hover:bg-orange-700 hover:scale-110 active:scale-95">
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"></path>
+        </svg>
+    </button>
+
     <script>
         (function () {
             // Preloader handler
@@ -120,6 +128,27 @@
                 }, observerOptions);
 
                 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+            }
+
+            // Back to Top Button Handler
+            const backToTopBtn = document.getElementById('back-to-top');
+            if (backToTopBtn) {
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 300) {
+                        backToTopBtn.classList.remove('opacity-0', 'pointer-events-none');
+                        backToTopBtn.classList.add('opacity-100', 'pointer-events-auto');
+                    } else {
+                        backToTopBtn.classList.add('opacity-0', 'pointer-events-none');
+                        backToTopBtn.classList.remove('opacity-100', 'pointer-events-auto');
+                    }
+                }, { passive: true });
+
+                backToTopBtn.addEventListener('click', () => {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
             }
         })();
     </script>
