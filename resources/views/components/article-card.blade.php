@@ -1,12 +1,29 @@
 @props([
-    'title' => 'Judul Artikel',
-    'excerpt' => 'Deskripsi singkat mengenai isi artikel yang menarik untuk dibaca lebih lanjut.',
-    'category' => 'Pendidikan',
+    'title' => 'PENGARUH KUALITAS LAYANAN, PROMOSI DAN LOKASI TERHADAP KEPUTUSAN ORANG TUA MEMILIH BIMBA AIUEO RAWALUMBU BEKASI',
+    'abstract' => 'The background of this study stems from the increasingly competitive landscape among early childhood education institutions. This situation pushes each institution to better understand what factors parents actually consider when choosing a place for their children to learn.',
+    'category' => 'Manajemen Pendidikan & Bisnis',
     'date' => '5 Ags 2026',
-    'readTime' => '5 min baca',
-    'author' => 'Redaksi CIB',
+    'authors' => ['Syerliananda Oktavia', 'Indra Muis'],
     'slug' => 'sample-article'
 ])
+
+@php
+    if (is_iterable($authors) && !is_string($authors)) {
+        $authorList = collect($authors)
+            ->map(fn($item) => is_object($item) ? ($item->name ?? (string) $item) : (string) $item)
+            ->filter()
+            ->values();
+    } elseif (is_string($authors) && str_contains($authors, ';')) {
+        $authorList = collect(explode(';', $authors))
+            ->map(fn($item) => trim($item))
+            ->filter()
+            ->values();
+    } elseif (is_string($authors)) {
+        $authorList = collect([trim($authors)])->filter()->values();
+    } else {
+        $authorList = collect([(string) $authors])->filter()->values();
+    }
+@endphp
 
 <article class="group glass-card hover:bg-white/95 border border-white/80 hover:border-orange-300/80 rounded-2xl p-6 sm:p-7 shadow-sm hover:shadow-xl hover:shadow-orange-500/5 transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
     
@@ -20,8 +37,6 @@
             </span>
             <span class="text-slate-400">&bull;</span>
             <span class="text-slate-500 font-medium">{{ $date }}</span>
-            <span class="text-slate-400">&bull;</span>
-            <span class="text-slate-500 font-medium">{{ $readTime }}</span>
         </div>
 
         <!-- Title -->
@@ -30,19 +45,16 @@
                 {{ $title }}
             </a>
         </h3>
-
-        <!-- Excerpt -->
-        <p class="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed font-normal">
-            {{ $excerpt }}
-        </p>
-
         <!-- Author Tag -->
         <div class="flex items-center gap-2 pt-1 text-xs text-slate-500">
-            <div class="w-6 h-6 rounded-full bg-orange-100 border border-orange-200 flex items-center justify-center text-[10px] font-bold text-orange-600">
-                {{ strtoupper(substr($author, 0, 1)) }}
-            </div>
-            <span class="font-semibold text-slate-700">{{ $author }}</span>
+            <span class="font-semibold text-slate-700">{{ $authorList->join('; ') }}</span>
         </div>
+
+        <!-- Abstract -->
+        <p class="text-xs sm:text-sm text-slate-600 line-clamp-1 leading-relaxed font-normal">
+            {{ $abstract }}
+        </p>
+
 
     </div>
 

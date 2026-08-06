@@ -1,19 +1,17 @@
 <header class="sticky top-0 z-50 w-full">
-    <div id="navbar-container" 
-         class="max-w-7xl mx-auto flex items-center justify-between gap-4 bg-white/95 backdrop-blur-md rounded-full border-b border-slate-100/80 p-2 my-2 sm:py-3 sm:px-5 transition-all duration-300 [&.is-scrolled]:shadow-xl [&.is-scrolled]:shadow-slate-950/10 [&.is-scrolled]:bg-white/90 [&.is-scrolled]:backdrop-blur-xl [&.is-scrolled]:border-slate-200/80">
-        
+    <div id="navbar-container"
+        class="mx-auto my-2 flex max-w-[90vw] items-center justify-between gap-4 rounded-full border-b border-slate-100/80 bg-white/95 p-2 backdrop-blur-md transition-all duration-300 sm:px-5 sm:py-3 [&.is-scrolled]:border-slate-200/80 [&.is-scrolled]:bg-white/90 [&.is-scrolled]:shadow-xl [&.is-scrolled]:shadow-slate-950/10 [&.is-scrolled]:backdrop-blur-xl">
+
         <!-- Brand Logo -->
-        <a href="{{ route('home') }}" class="flex items-center gap-3 group">
-            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-950 group-hover:bg-orange-600 flex items-center justify-center text-white font-bold shadow-md group-hover:scale-105 transition-all">
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                </svg>
+        <a href="{{ route('home') }}" class="group flex items-center gap-3">
+            <div class="flex h-8 w-8 items-center justify-center transition-all group-hover:scale-105 sm:h-9 sm:w-9">
+                <img src="{{ asset('assets/images/logo.png') }}" alt="Logo CIB">
             </div>
             <div class="flex flex-col">
-                <span class="font-extrabold text-sm sm:text-base text-slate-950 group-hover:text-orange-600 font-heading leading-tight tracking-tight transition-colors">
+                <span class="font-heading text-sm font-extrabold leading-tight tracking-tight text-slate-950 transition-colors group-hover:text-orange-600 sm:text-base">
                     cahaya ilmu
                 </span>
-                <span class="font-extrabold text-sm sm:text-base text-slate-950 group-hover:text-orange-600 font-heading leading-tight tracking-tight -mt-1 transition-colors">
+                <span class="font-heading -mt-1 text-sm font-extrabold leading-tight tracking-tight text-slate-950 transition-colors group-hover:text-orange-600 sm:text-base">
                     bangsa
                 </span>
             </div>
@@ -22,22 +20,12 @@
         <!-- Navigation Links & Right Actions -->
         <div class="flex items-center gap-6 sm:gap-10">
             <!-- Navigation Links -->
-            <nav class="hidden md:flex items-center gap-8 text-xs sm:text-sm font-semibold text-slate-600">
-                <a href="{{ route('home') }}" 
-                   class="transition-colors hover:text-orange-600 {{ request()->routeIs('home') ? 'text-orange-600 font-bold' : '' }}">
+            <nav class="hidden items-center gap-8 text-xs font-semibold text-slate-600 sm:text-sm md:flex">
+                <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'text-orange-600 font-bold' : '' }} transition-colors hover:text-orange-600">
                     Beranda
                 </a>
-                <a href="{{ route('search') }}" 
-                   class="transition-colors hover:text-orange-600 {{ request()->routeIs('search') ? 'text-orange-600 font-bold' : '' }}">
+                <a href="{{ route('search') }}" class="{{ request()->routeIs('search') ? 'text-orange-600 font-bold' : '' }} transition-colors hover:text-orange-600">
                     Artikel & Riset
-                </a>
-                <a href="{{ route('search') }}?category=Jurnal" 
-                   class="transition-colors hover:text-orange-600">
-                    Jurnal
-                </a>
-                <a href="{{ route('article.show', ['slug' => 'sample-article']) }}" 
-                   class="transition-colors hover:text-orange-600 {{ request()->routeIs('article.show') ? 'text-orange-600 font-bold' : '' }}">
-                    Tentang Kami
                 </a>
             </nav>
 
@@ -45,19 +33,18 @@
             @if (Route::has('login'))
                 <div class="flex items-center gap-3 sm:gap-4">
                     @auth
-                        <a href="{{ url('/admin') }}" 
-                           class="px-6 py-2.5 rounded-full bg-slate-950 hover:bg-orange-600 text-white font-semibold text-xs sm:text-sm shadow-md transition-all transform hover:scale-105 active:scale-95 whitespace-nowrap">
+                        <a href="{{ url('/admin') }}"
+                            class="transform whitespace-nowrap rounded-full bg-slate-950 px-6 py-2.5 text-xs font-semibold text-white shadow-md transition-all hover:scale-105 hover:bg-orange-600 active:scale-95 sm:text-sm">
                             Dashboard
                         </a>
                     @else
-                        <a href="{{ route('login') }}" 
-                           class="text-xs sm:text-sm font-semibold text-slate-700 hover:text-orange-600 transition-colors px-2 py-1">
+                        <a href="{{ route('login') }}" class="px-2 py-1 text-xs font-semibold text-slate-700 transition-colors hover:text-orange-600 sm:text-sm">
                             Log in
                         </a>
 
                         @if (Route::has('register'))
-                            <a href="{{ route('register') }}" 
-                               class="px-6 py-2.5 rounded-full bg-slate-950 hover:bg-orange-600 text-white font-semibold text-xs sm:text-sm shadow-md transition-all transform hover:scale-105 active:scale-95 whitespace-nowrap">
+                            <a href="{{ route('register') }}"
+                                class="transform whitespace-nowrap rounded-full bg-slate-950 px-6 py-2.5 text-xs font-semibold text-white shadow-md transition-all hover:scale-105 hover:bg-orange-600 active:scale-95 sm:text-sm">
                                 Register
                             </a>
                         @endif
@@ -70,7 +57,7 @@
 </header>
 
 <script>
-    (function () {
+    (function() {
         function initStickyNavbar() {
             const navDiv = document.getElementById('navbar-container');
             if (!navDiv) return;
@@ -83,7 +70,9 @@
                 }
             }
 
-            window.addEventListener('scroll', handleScroll, { passive: true });
+            window.addEventListener('scroll', handleScroll, {
+                passive: true
+            });
             handleScroll();
         }
 

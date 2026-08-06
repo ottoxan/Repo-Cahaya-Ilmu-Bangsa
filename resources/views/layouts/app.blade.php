@@ -4,9 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
+    <link rel="icon" type="image/png" href="{{ asset('assets/images/logo.png') }}">
     <title>{{ $title ?? 'Cahaya Ilmu Bangsa' }} - Repositori & Portal Riset</title>
     <meta name="description" content="{{ $description ?? 'Repositori naskah, jurnal ilmiah, dan artikel sains Cahaya Ilmu Bangsa.' }}">
+    {{ $meta ?? '' }}
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

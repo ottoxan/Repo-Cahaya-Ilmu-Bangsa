@@ -1,63 +1,64 @@
-<footer class="bg-[#07131B] text-slate-300 border-t border-white/10 mt-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 lg:gap-12">
-            
+<footer class="mt-20 border-t border-white/10 bg-[#07131B] text-slate-300">
+    <div class="mx-auto max-w-[90vw] px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-4 lg:gap-12">
+
             <!-- Brand Info -->
-            <div class="md:col-span-1 space-y-4">
+            <div class="space-y-4 md:col-span-1">
                 <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center text-white font-bold shadow-md shadow-orange-500/30">
-                        C
+                    <div class="flex h-12 w-auto">
+                        <img src="{{ asset('assets/images/logo.png') }}" alt="logo">
                     </div>
-                    <span class="font-bold text-lg text-white font-heading">Cahaya Ilmu Bangsa</span>
+                    <span class="font-heading text-2xl font-bold text-white">Cahaya Ilmu Bangsa</span>
                 </div>
-                <p class="text-xs leading-relaxed text-slate-400 font-light">
+                <p class="text-xs font-light leading-relaxed text-slate-400">
                     Menyinari peradaban nusantara melalui repositori riset terakreditasi, naskah ilmiah, dan literasi kebangsaan.
                 </p>
-                <div class="pt-2 text-xs text-slate-500">
-                    &copy; {{ date('Y') }} PT Cahaya Ilmu Bangsa. All rights reserved.
-                </div>
             </div>
 
             <!-- Quick Navigation -->
             <div>
-                <h4 class="text-xs font-bold uppercase tracking-wider text-orange-400 mb-4">Navigasi Utama</h4>
+                <h4 class="mb-4 text-xs font-bold uppercase tracking-wider text-orange-400">Navigasi Utama</h4>
                 <ul class="space-y-2.5 text-xs">
-                    <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">Beranda</a></li>
-                    <li><a href="{{ route('search') }}" class="hover:text-white transition-colors">Eksplorasi Artikel</a></li>
-                    <li><a href="{{ route('search') }}?category=Pendidikan" class="hover:text-white transition-colors">Kategori Pendidikan</a></li>
-                    <li><a href="{{ route('search') }}?category=Sains" class="hover:text-white transition-colors">Sains & Teknologi</a></li>
+                    <li><a href="{{ route('home') }}" class="transition-colors hover:text-white">Beranda</a></li>
+                    <li><a href="{{ route('search') }}" class="transition-colors hover:text-white">Eksplorasi Artikel</a></li>
                 </ul>
             </div>
 
-            <!-- Services -->
+            <!-- Services & Links -->
             <div>
-                <h4 class="text-xs font-bold uppercase tracking-wider text-orange-400 mb-4">Layanan Penerbitan</h4>
+                <h4 class="mb-4 text-xs font-bold uppercase tracking-wider text-orange-400">Layanan & Jurnal</h4>
                 <ul class="space-y-2.5 text-xs">
-                    <li><a href="#" class="hover:text-white transition-colors">Kirimkan Naskah</a></li>
-                    <li><a href="#" class="hover:text-white transition-colors">Pedoman Penulisan</a></li>
-                    <li><a href="#" class="hover:text-white transition-colors">Hak Cipta & DOI</a></li>
-                    <li><a href="/admin" class="hover:text-white transition-colors">Portal Penulis & Editor</a></li>
+                    <li>
+                        <a href="https://journal.cib.institute" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 transition-colors hover:text-white">
+                            <span>Jurnal CIB Institute</span>
+                            <svg class="h-3 w-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://loa.jurnalcib.com/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 transition-colors hover:text-white">
+                            <span>Cek LoA (Letter of Acceptance)</span>
+                            <svg class="h-3 w-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/admin" class="transition-colors hover:text-white">Portal Penulis & Editor</a>
+                    </li>
                 </ul>
             </div>
 
-            <!-- Newsletter -->
-            <div>
-                <h4 class="text-xs font-bold uppercase tracking-wider text-orange-400 mb-4">Berlangganan Wawasan</h4>
-                <p class="text-xs text-slate-400 mb-3 font-light">
-                    Dapatkan buletin riset mingguan langsung di email Anda.
-                </p>
-                <form onsubmit="event.preventDefault(); alert('Terima kasih telah berlangganan!');" class="space-y-2">
-                    <input type="email" 
-                           placeholder="Alamat email Anda..." 
-                           required
-                           class="w-full px-3.5 py-2 text-xs bg-[#0D2432] border border-white/15 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 text-white placeholder-slate-500">
-                    <button type="submit" 
-                            class="w-full py-2 px-4 text-xs font-bold text-white bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 rounded-full transition-all shadow-md shadow-orange-500/20">
-                        Berlangganan Gratis
-                    </button>
-                </form>
-            </div>
+        </div>
+    </div>
 
+    <!-- Bottom Credit Bar -->
+    <div class="py-4">
+        <div class="mx-auto flex max-w-[90vw] flex-col items-center justify-between gap-2 px-4 text-xs text-slate-400 sm:flex-row sm:px-6 lg:px-8">
+            <div>
+                &copy; 2027 Cahaya Ilmu Bangsa. All rights reserved.
+            </div>
+            <div class="flex items-center gap-1.5 font-medium">
+                <span>Developed by</span>
+                <span class="font-bold text-orange-400">RyuDevs</span>
+            </div>
         </div>
     </div>
 </footer>

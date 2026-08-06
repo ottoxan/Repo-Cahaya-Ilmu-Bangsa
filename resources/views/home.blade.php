@@ -4,16 +4,16 @@
 
     <!-- Main Hero Banner with Inner Rounded Card Container -->
     <div class="px-4 pb-8 pt-4 sm:px-6 lg:px-8">
-        <section class="reveal relative flex min-h-[80vh] justify-center items-center overflow-hidden rounded-[28px] bg-slate-950 bg-cover bg-center text-white"
+        <section class="reveal relative flex min-h-[80vh] items-center justify-center overflow-hidden rounded-[28px] bg-slate-950 bg-cover bg-center text-white"
             style="background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.92)), url('{{ asset('assets/images/background.png') }}');">
-            <div class="max-w-7xl mx-auto w-full px-6 py-12">
+            <div class="mx-auto w-full max-w-[90vw] px-6 py-12">
 
                 <!-- Subtle Ambient Background Accents -->
                 <div class="pointer-events-none absolute right-10 top-10 h-96 w-96 rounded-full bg-blue-500/20 blur-3xl"></div>
                 <div class="pointer-events-none absolute bottom-10 left-10 h-80 w-80 rounded-full bg-orange-500/15 blur-3xl"></div>
 
                 <!-- Top Pill Badge -->
-                <div class="reveal delay-100 relative z-10 flex items-center justify-between">
+                <div class="reveal relative z-10 flex items-center justify-between delay-100">
                     <div class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white backdrop-blur-md">
                         <span>⚡</span>
                         <span>Repositori Riset Buka-Akses</span>
@@ -23,12 +23,12 @@
                 <!-- Central Hero Headline & Floating Widgets -->
                 <div class="relative z-10 my-auto max-w-4xl space-y-6 py-12">
 
-                    <h1 class="reveal delay-200 font-heading text-4xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-6xl lg:text-7xl">
+                    <h1 class="reveal font-heading text-4xl font-extrabold leading-[1.1] tracking-tight text-white delay-200 sm:text-6xl lg:text-7xl">
                         Literasi & Riset <br class="hidden sm:inline" />
                         yang <span class="bg-orange-500 bg-clip-text text-transparent">menyinari</span> peradaban
                     </h1>
 
-                    <p class="reveal delay-300 max-w-2xl text-sm font-light leading-relaxed text-slate-300 sm:text-base lg:text-lg">
+                    <p class="reveal max-w-2xl text-sm font-light leading-relaxed text-slate-300 delay-300 sm:text-base lg:text-lg">
                         Jelajahi naskah ilmiah, ulasan akademis, dan jurnal terakreditasi. Didesain untuk para peneliti yang percaya setiap wawasan harus dapat diakses bebas.
                     </p>
 
@@ -66,7 +66,7 @@
     </div>
 
     <!-- Latest Articles Row List Section -->
-    <section class="mx-auto max-w-7xl px-6 py-12 sm:py-16 lg:px-8">
+    <section class="mx-auto max-w-[90vw] px-6 py-12 sm:py-16 lg:px-8">
         <div class="reveal mb-8 flex flex-col justify-between gap-4 border-b border-slate-200/80 pb-6 sm:flex-row sm:items-end">
             <div>
                 <span class="text-xs font-bold uppercase tracking-widest text-orange-600">Publikasi Terbaru</span>
@@ -85,26 +85,26 @@
         <div class="flex flex-col space-y-4">
             <div class="reveal delay-100">
                 <x-article-card title="Transformasi Kurikulum Digital dalam Mengakselerasi Mutu Pendidikan Indonesia"
-                    excerpt="Sebuah tinjauan komprehensif mengenai penerapan kurikulum berbasis teknologi dan tantangan pemerataan infrastruktur sekolah." category="Pendidikan" date="5 Ags 2026"
-                    readTime="7 min baca" author="Dr. Raden Haryo" slug="transformasi-kurikulum-digital" />
+                    abstract="Sebuah tinjauan komprehensif mengenai penerapan kurikulum berbasis teknologi dan tantangan pemerataan infrastruktur sekolah." category="Pendidikan" date="5 Ags 2026"
+                    authors="Dr. Raden Haryo" slug="transformasi-kurikulum-digital" />
             </div>
 
             <div class="reveal delay-200">
                 <x-article-card title="Pentingnya Penguatan Literasi Digital Pada Generasi Z di Era GenAI"
-                    excerpt="Perkembangan AI generatif menuntut fondasi kritis sejak dini agar generasi muda menjadi produsen pengetahuan." category="Sains & Teknologi" date="4 Ags 2026"
-                    readTime="6 min baca" author="Dr. Ahmad Subagyo" slug="literasi-digital-gen-z" />
+                    abstract="Perkembangan AI generatif menuntut fondasi kritis sejak dini agar generasi muda menjadi produsen pengetahuan." category="Sains & Teknologi" date="4 Ags 2026"
+                    authors="Dr. Ahmad Subagyo" slug="literasi-digital-gen-z" />
             </div>
 
             <div class="reveal delay-300">
                 <x-article-card title="Strategi Penerbitan Akademik Berstandar Internasional Bagi Peneliti Muda"
-                    excerpt="Langkah praktis menyusun naskah ilmiah, memilih jurnal bereputasi, dan menghindari perangkap jurnal predator." category="Pendidikan" date="3 Ags 2026" readTime="8 min baca"
-                    author="Prof. Dewi Lestari" slug="strategi-penerbitan-akademik" />
+                    abstract="Langkah praktis menyusun naskah ilmiah, memilih jurnal bereputasi, dan menghindari perangkap jurnal predator." category="Pendidikan" date="3 Ags 2026"
+                    authors="Prof. Dewi Lestari" slug="strategi-penerbitan-akademik" />
             </div>
 
             <div class="reveal delay-400">
                 <x-article-card title="Menjaga Keberagaman Budaya Lokal Melalui Digitalisasi Naskah Kuno"
-                    excerpt="Upaya penyelamatan naskah Nusantara melalui teknik pemindaian tinggi dan pengarsipan digital berbasis sains." category="Kebudayaan" date="1 Ags 2026" readTime="4 min baca"
-                    author="Budi Santoso, M.Hum" slug="digitalisasi-naskah-kuno" />
+                    abstract="Upaya penyelamatan naskah Nusantara melalui teknik pemindaian tinggi dan pengarsipan digital berbasis sains." category="Kebudayaan" date="1 Ags 2026"
+                    authors="Budi Santoso, M.Hum" slug="digitalisasi-naskah-kuno" />
             </div>
         </div>
     </section>
