@@ -8,10 +8,6 @@
             style="background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.92)), url('{{ asset('assets/images/background.png') }}');">
             <div class="mx-auto w-full max-w-[90vw] px-6 py-12">
 
-                <!-- Subtle Ambient Background Accents -->
-                <div class="pointer-events-none absolute right-10 top-10 h-96 w-96 rounded-full bg-blue-500/20 blur-3xl"></div>
-                <div class="pointer-events-none absolute bottom-10 left-10 h-80 w-80 rounded-full bg-orange-500/15 blur-3xl"></div>
-
                 <!-- Top Pill Badge -->
                 <div class="reveal relative z-10 flex items-center justify-between delay-100">
                     <div class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white backdrop-blur-md">
