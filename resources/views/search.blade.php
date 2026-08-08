@@ -25,14 +25,14 @@
                         </svg>
 
                         <button type="submit"
-                            class="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-5 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:from-orange-600 hover:to-amber-600">
+                            class="absolute right-2 top-1/2 -translate-y-1/2 transform rounded-full bg-orange-500 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:scale-105 hover:bg-orange-600 active:scale-95">
                             Cari
                         </button>
                     </div>
                 </form>
 
                 <!-- Active Category Glass Filters -->
-                <div class="flex flex-wrap items-center justify-center gap-2 pt-2 text-xs">
+                <div class="flex flex-wrap items-center justify-center gap-2 pt-2">
                     <span class="text-slate-400">Filter cepat:</span>
                     @foreach (['Semua', 'Pendidikan', 'Sains & Teknologi', 'Kebudayaan', 'Ekonomi'] as $filter)
                         @php $isActive = request('category') === $filter || (!request('category') && $filter === 'Semua'); @endphp
