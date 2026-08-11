@@ -3,17 +3,11 @@
         <div class="grid grid-cols-1 gap-8 md:grid-cols-4 lg:gap-12">
 
             <!-- Brand Info -->
-            <div class="space-y-4 md:col-span-1">
-                <div class="flex items-center gap-3">
-                    <div class="flex h-12 w-auto">
-                        <img src="{{ asset('assets/images/logo.png') }}" alt="logo">
-                    </div>
-                    <span class="font-heading text-2xl font-bold text-white">Cahaya Ilmu Bangsa</span>
-                </div>
-                <p class="text-xs font-light leading-relaxed text-slate-400">
-                    Menyinari peradaban nusantara melalui repositori riset terakreditasi, naskah ilmiah, dan literasi kebangsaan.
-                </p>
+            
+            <div class="flex h-30 w-auto">
+                <img src="{{ asset('assets/images/footer_logo.svg') }}" alt="logo">
             </div>
+            
 
             <!-- Quick Navigation -->
             <div>

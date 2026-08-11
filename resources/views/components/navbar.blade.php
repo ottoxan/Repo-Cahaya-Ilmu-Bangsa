@@ -3,18 +3,12 @@
         class="mx-auto my-2 flex max-w-[90vw] items-center justify-between gap-4 rounded-full border-b border-slate-100/80 bg-white/95 p-2 backdrop-blur-md transition-all duration-300 sm:px-5 sm:py-3 [&.is-scrolled]:border-slate-200/80 [&.is-scrolled]:bg-white/90 [&.is-scrolled]:shadow-xl [&.is-scrolled]:shadow-slate-950/10 [&.is-scrolled]:backdrop-blur-xl">
 
         <!-- Brand Logo -->
-        <a href="{{ route('home') }}" class="group flex items-center gap-3">
-            <div class="flex h-8 w-8 items-center justify-center transition-all group-hover:scale-105 sm:h-9 sm:w-9">
-                <img src="{{ asset('assets/images/logo.png') }}" alt="Logo CIB">
+        <a href="{{ route('home') }}" class="group flex items-center">
+            <div class="flex transition-all group-hover:scale-105">
+                <img class="w-50" src="{{ asset('assets/images/logo.svg') }}" alt="Logo CIB">
             </div>
-            <div class="flex flex-col">
-                <span class="font-heading text-sm font-extrabold leading-tight tracking-tight text-slate-950 transition-colors group-hover:text-orange-600 sm:text-base">
-                    cahaya ilmu
-                </span>
-                <span class="font-heading -mt-1 text-sm font-extrabold leading-tight tracking-tight text-slate-950 transition-colors group-hover:text-orange-600 sm:text-base">
-                    bangsa
-                </span>
-            </div>
+            
+            
         </a>
 
         <!-- Navigation Links & Right Actions -->
