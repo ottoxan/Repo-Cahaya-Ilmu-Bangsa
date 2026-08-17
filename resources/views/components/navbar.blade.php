@@ -5,14 +5,15 @@
         <!-- Brand Logo -->
         <a href="{{ route('home') }}" class="group flex items-center">
             <div class="flex transition-all group-hover:scale-105">
-                <img class="w-50" src="{{ asset('assets/images/logo.svg') }}" alt="Logo CIB">
+                <img class="hidden sm:block w-50" src="{{ asset('assets/images/logo.svg') }}" alt="Logo CIB">
+                <img class="block sm:hidden h-9 w-auto" src="{{ asset('assets/images/logo-doi.svg') }}" alt="Logo CIB">
             </div>
             
             
         </a>
 
         <!-- Navigation Links & Right Actions -->
-        <div class="flex items-center gap-6 sm:gap-10">
+        <div class="flex items-center gap-3 sm:gap-6">
             <!-- Navigation Links -->
             <nav class="hidden items-center gap-6 text-xs font-semibold text-slate-600 transition-all duration-300 sm:gap-8 sm:text-sm md:flex">
                 <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'text-orange-600 font-bold' : '' }} whitespace-nowrap transition-colors hover:text-orange-600">
@@ -78,8 +79,45 @@
                     @endauth
                 </div>
             @endif
+
+            <!-- Mobile Menu Toggle Button (Phone sizes only) -->
+            <button id="mobile-menu-toggle" type="button" aria-label="Buka Menu Navigasi"
+                class="flex items-center justify-center rounded-full border border-slate-200 bg-slate-50 p-2 text-slate-600 transition-all hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600 focus:outline-none md:hidden">
+                <svg id="mobile-menu-open-icon" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+                <svg id="mobile-menu-close-icon" class="hidden h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
         </div>
 
+    </div>
+
+    <!-- Mobile Dropdown Navigation Menu (Phone sizes only) -->
+    <div id="mobile-menu"
+        class="mx-auto flex max-w-[90vw] max-h-0 overflow-hidden opacity-0 pointer-events-none -translate-y-2 scale-95 flex-col rounded-2xl border border-slate-100/80 bg-white/95 shadow-none backdrop-blur-md transition-all duration-300 ease-in-out md:hidden">
+        <div class="flex flex-col gap-2 p-4">
+            <a href="{{ route('home') }}"
+                class="{{ request()->routeIs('home') ? 'bg-orange-50 text-orange-600 font-bold' : 'text-slate-700 hover:bg-slate-50 hover:text-orange-600' }} rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors">
+                Beranda
+            </a>
+            <a href="{{ route('search') }}"
+                class="{{ request()->routeIs('search') ? 'bg-orange-50 text-orange-600 font-bold' : 'text-slate-700 hover:bg-slate-50 hover:text-orange-600' }} rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors">
+                Artikel & Riset
+            </a>
+            <!-- Mobile Search Form -->
+            <form action="{{ route('search') }}" method="GET" class="mt-1 flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2">
+                <svg class="h-4 w-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari artikel, jurnal, DOI..."
+                    class="w-full bg-transparent text-xs text-slate-900 placeholder-slate-400 focus:outline-none">
+                <button type="submit" class="rounded-lg bg-orange-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-orange-700">
+                    Cari
+                </button>
+            </form>
+        </div>
     </div>
 </header>
 
@@ -141,14 +179,68 @@
             });
         }
 
+        function initMobileMenu() {
+            const toggleBtn = document.getElementById('mobile-menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const openIcon = document.getElementById('mobile-menu-open-icon');
+            const closeIcon = document.getElementById('mobile-menu-close-icon');
+
+            if (!toggleBtn || !mobileMenu) return;
+
+            let isOpen = false;
+
+            function openMenu() {
+                isOpen = true;
+                mobileMenu.classList.remove('max-h-0', 'opacity-0', 'pointer-events-none', '-translate-y-2', 'scale-95', 'shadow-none');
+                mobileMenu.classList.add('max-h-96', 'opacity-100', 'pointer-events-auto', 'translate-y-0', 'scale-100', 'shadow-xl', 'mt-2');
+                if (openIcon && closeIcon) {
+                    openIcon.classList.add('hidden');
+                    closeIcon.classList.remove('hidden');
+                }
+            }
+
+            function closeMenu() {
+                isOpen = false;
+                mobileMenu.classList.remove('max-h-96', 'opacity-100', 'pointer-events-auto', 'translate-y-0', 'scale-100', 'shadow-xl', 'mt-2');
+                mobileMenu.classList.add('max-h-0', 'opacity-0', 'pointer-events-none', '-translate-y-2', 'scale-95', 'shadow-none');
+                if (openIcon && closeIcon) {
+                    openIcon.classList.remove('hidden');
+                    closeIcon.classList.add('hidden');
+                }
+            }
+
+            toggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (isOpen) {
+                    closeMenu();
+                } else {
+                    openMenu();
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (isOpen && !mobileMenu.contains(e.target) && !toggleBtn.contains(e.target)) {
+                    closeMenu();
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && isOpen) {
+                    closeMenu();
+                }
+            });
+        }
+
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
                 initStickyNavbar();
                 initNavSearch();
+                initMobileMenu();
             });
         } else {
             initStickyNavbar();
             initNavSearch();
+            initMobileMenu();
         }
     })();
 </script>

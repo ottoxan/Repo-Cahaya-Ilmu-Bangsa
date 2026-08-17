@@ -4,7 +4,7 @@
 
     <!-- Main Hero Banner with Inner Rounded Card Container -->
     <div class="px-4 pb-8 pt-4 sm:px-6 lg:px-8">
-        <section class="reveal relative flex min-h-[80vh] items-center justify-center overflow-hidden rounded-[28px] bg-slate-950 bg-cover bg-center text-white"
+        <section class="reveal relative flex min-h-[50vh] sm:min-h-[80vh] items-center justify-center overflow-hidden rounded-[28px] bg-slate-950 bg-cover bg-center text-white"
             style="background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.92)), url('{{ asset('assets/images/background.png') }}');">
             <div class="mx-auto w-full max-w-[90vw] px-6 py-12">
 
@@ -19,10 +19,7 @@
                 <!-- Central Hero Headline & Floating Widgets -->
                 <div class="relative z-10 my-auto max-w-4xl space-y-6 py-12">
 
-                    <h1 class="reveal font-heading text-4xl font-extrabold leading-[1.1] tracking-tight text-white delay-200 sm:text-6xl lg:text-7xl">
-                        Literasi & Riset <br class="hidden sm:inline" />
-                        yang <span class="bg-orange-500 bg-clip-text text-transparent">menyinari</span> peradaban
-                    </h1>
+                    <img class="w-2xl" src="{{ asset('assets/images/logo-white.svg') }}" alt="Logo CIB">
 
                     <p class="reveal max-w-2xl text-sm font-light leading-relaxed text-slate-300 delay-300 sm:text-base lg:text-lg">
                         Jelajahi naskah ilmiah, ulasan akademis, dan jurnal terakreditasi. Didesain untuk para peneliti yang percaya setiap wawasan harus dapat diakses bebas.
