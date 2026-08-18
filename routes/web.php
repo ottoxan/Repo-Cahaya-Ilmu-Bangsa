@@ -100,13 +100,13 @@ Route::get('/article/{slug}/download', function ($slug) {
 })->name('article.download');
 
 Route::get('/login-redirect', function () {
-    $loaUrl = env('LOA_URL', 'http://localhost:8000');
+    $loaUrl = env('LOA_URL', 'http://127.0.0.1:8000');
     $callbackUrl = route('sso.callback');
     return redirect($loaUrl . '/sso/login?redirect=' . urlencode($callbackUrl));
 })->name('login');
 
 Route::get('/register-redirect', function () {
-    $loaUrl = env('LOA_URL', 'http://localhost:8000');
+    $loaUrl = env('LOA_URL', 'http://127.0.0.1:8000');
     return redirect($loaUrl . '/register');
 })->name('register');
 
@@ -142,8 +142,9 @@ Route::get('/sso/callback', function (\Illuminate\Http\Request $request) {
     // Log the user in
     \Illuminate\Support\Facades\Auth::login($user, true);
 
-    // Redirect to intended route or admin dashboard
-    $intended = session()->pull('url.intended', url('/admin'));
+    // Redirect to fallback parameter if present, otherwise intended
+    $fallback = $request->query('fallback');
+    $intended = $fallback ?: session()->pull('url.intended', url('/admin'));
 
     return redirect($intended);
 })->name('sso.callback');
@@ -158,3 +159,107 @@ Route::post('/api/v1/articles/publish', [\App\Http\Controllers\Api\ArticleApiCon
 Route::get('/oai', [\App\Http\Controllers\OaiPmhController::class, 'handle'])->name('oai');
 Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'sitemap'])->name('sitemap');
 Route::get('/robots.txt', [\App\Http\Controllers\SitemapController::class, 'robots'])->name('robots');
+
+
+// SSO AJAX Synchronization Routes
+Route::post('/sso/callback-ajax', function (\Illuminate\Http\Request $request) {
+    $userId = $request->input('user_id');
+    $expiresAt = $request->input('expires_at');
+    $signature = $request->input('signature');
+
+    if (empty($userId) || empty($expiresAt) || empty($signature)) {
+        return response()->json(['success' => false, 'message' => 'Missing parameters'], 400);
+    }
+
+    if (now()->timestamp > $expiresAt) {
+        return response()->json(['success' => false, 'message' => 'Expired token'], 403);
+    }
+
+    $ssoSecret = env('SSO_SECRET', 'cib_sso_secret_key_2026_jwt');
+    $expectedSignature = hash_hmac('sha256', $userId . '|' . $expiresAt, $ssoSecret);
+
+    if (!hash_equals($expectedSignature, $signature)) {
+        return response()->json(['success' => false, 'message' => 'Invalid signature'], 403);
+    }
+
+    $user = \App\Models\User::find($userId);
+    if (!$user) {
+        return response()->json(['success' => false, 'message' => 'User not found'], 404);
+    }
+
+    \Illuminate\Support\Facades\Auth::login($user, true);
+
+    return response()->json(['success' => true]);
+});
+
+Route::post('/sso/logout-ajax', function () {
+    \Illuminate\Support\Facades\Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+
+    return response()->json(['success' => true]);
+});
+
+
+// SSO Iframe check route for LOA (Auto-detect status login in background)
+Route::get('/sso/iframe-check', function (\Illuminate\Http\Request $request) {
+    $origin = $request->query('origin');
+    if (empty($origin)) {
+        return response('Origin required', 400);
+    }
+
+    $origin = urldecode($origin);
+
+    $user = \Illuminate\Support\Facades\Auth::user();
+    $data = ['logged_in' => false];
+
+    if ($user) {
+        $expiresAt = now()->addMinutes(5)->timestamp;
+        $ssoSecret = env('SSO_SECRET', 'cib_sso_secret_key_2026_jwt');
+        $signature = hash_hmac('sha256', $user->id . '|' . $expiresAt, $ssoSecret);
+
+        $data = [
+            'logged_in' => true,
+            'user_id' => $user->id,
+            'expires_at' => $expiresAt,
+            'signature' => $signature,
+        ];
+    }
+
+    $jsonData = json_encode($data);
+
+    return response("
+        <!DOCTYPE html>
+        <html>
+        <body>
+        <script>
+            window.parent.postMessage({
+                type: 'cib_sso_status',
+                data: {$jsonData}
+            }, '{$origin}');
+        </script>
+        </body>
+        </html>
+    ")
+    ->header('Content-Type', 'text/html')
+    ->header('Content-Security-Policy', "frame-ancestors 'self' http://127.0.0.1:8000 http://localhost:8000")
+    ->header('X-Frame-Options', 'ALLOWALL');
+})->name('sso.iframe-check');
+
+
+// SSO Single Log-Out (SLO) Route
+Route::get('/sso/logout', function (\Illuminate\Http\Request $request) {
+    \Illuminate\Support\Facades\Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    $redirect = $request->query('redirect');
+    $sso = $request->query('sso');
+
+    if ($sso) {
+        return redirect($redirect ?: '/');
+    }
+
+    $loaUrl = env('LOA_URL', 'http://127.0.0.1:8000');
+    return redirect($loaUrl . '/sso/logout?sso=true&redirect=' . urlencode($redirect ?: 'http://127.0.0.1:8001'));
+})->name('sso.logout');

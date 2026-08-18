@@ -18,15 +18,9 @@ class User extends Authenticatable
 
     protected $connection = 'loa';
 
-    public function save(array $options = [])
-    {
-        throw new \Exception('Model User is read-only in Repository.');
-    }
 
-    public function delete()
-    {
-        throw new \Exception('Model User is read-only in Repository.');
-    }
+
+
 
     protected function casts(): array
     {

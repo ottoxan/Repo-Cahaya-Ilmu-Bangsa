@@ -60,12 +60,16 @@
             <!-- Auth Navigation Actions -->
             @if (Route::has('login'))
                 <div class="flex items-center gap-3 sm:gap-4">
-                    @auth
+                    <!-- Auth Container -->
+                    <div id="sso-auth-container" style="display: {{ Auth::check() ? 'block' : 'none' }};">
                         <a href="{{ url('/admin') }}"
                             class="transform whitespace-nowrap rounded-full bg-slate-950 px-6 py-2.5 text-xs font-semibold text-white shadow-md transition-all hover:scale-105 hover:bg-orange-600 active:scale-95 sm:text-sm">
                             Dashboard
                         </a>
-                    @else
+                    </div>
+
+                    <!-- Guest Container -->
+                    <div id="sso-guest-container" class="flex items-center gap-3 sm:gap-4" style="display: {{ Auth::check() ? 'none' : 'flex' }};">
                         <a href="{{ route('login') }}" class="px-2 py-1 text-xs font-semibold text-slate-700 transition-colors hover:text-orange-600 sm:text-sm">
                             Log in
                         </a>
@@ -76,7 +80,7 @@
                                 Register
                             </a>
                         @endif
-                    @endauth
+                    </div>
                 </div>
             @endif
 

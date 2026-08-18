@@ -159,5 +159,72 @@
     </script>
 
     @stack('scripts')
+
+    <!-- SSO Iframe Check & Dynamic Auth Synchronization -->
+    <iframe id="sso-iframe" src="{{ env('LOA_URL', 'http://127.0.0.1:8000') }}/sso/iframe-check?origin={{ urlencode(url('/')) }}" style="display:none;"></iframe>
+
+    <script>
+        (function() {
+            let localUserLoggedIn = {{ Auth::check() ? 'true' : 'false' }};
+            const loaUrl = "{{ env('LOA_URL', 'http://127.0.0.1:8000') }}";
+
+            window.addEventListener('message', function(event) {
+                if (!event.origin.startsWith(loaUrl)) return;
+
+                if (event.data && event.data.type === 'cib_sso_status') {
+                    const sso = event.data.data;
+
+                    const authContainer = document.getElementById('sso-auth-container');
+                    const guestContainer = document.getElementById('sso-guest-container');
+
+                    if (sso.logged_in && !localUserLoggedIn) {
+                        localUserLoggedIn = true;
+                        
+                        // Dynamically update UI immediately
+                        if (authContainer) authContainer.style.display = 'block';
+                        if (guestContainer) guestContainer.style.display = 'none';
+
+                        // Silent Auto-Login via AJAX
+                        fetch('/sso/callback-ajax', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify(sso)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (!data.success) {
+                                // If sync failed, revert UI
+                                localUserLoggedIn = false;
+                                if (authContainer) authContainer.style.display = 'none';
+                                if (guestContainer) guestContainer.style.display = 'flex';
+                            }
+                        })
+                        .catch(() => {
+                            localUserLoggedIn = false;
+                            if (authContainer) authContainer.style.display = 'none';
+                            if (guestContainer) guestContainer.style.display = 'flex';
+                        });
+                    } 
+                }
+            });
+
+            // Helper to reload iframe check
+            function checkSso() {
+                const iframe = document.getElementById('sso-iframe');
+                if (iframe) {
+                    iframe.src = iframe.src;
+                }
+            }
+
+            // Check on tab focus/switch
+            window.addEventListener('focus', checkSso);
+
+            // Check periodically in background every 15 seconds
+            setInterval(checkSso, 15000);
+        })();
+    </script>
 </body>
 </html>
