@@ -78,33 +78,25 @@
 
         <!-- Articles Row List -->
         <div class="flex flex-col space-y-4">
-            <x-article-card title="Transformasi Kurikulum Digital dalam Mengakselerasi Mutu Pendidikan"
-                abstract="Tinjauan komprehensif penerapan kurikulum berbasis teknologi dan pemerataan infrastruktur sekolah." category="Pendidikan" date="5 Ags 2026" authors="Tim Redaksi CIB"
-                slug="transformasi-kurikulum-digital" />
-
-            <x-article-card title="Pentingnya Penguatan Literasi Digital Pada Generasi Z di Era GenAI"
-                abstract="Perkembangan AI generatif menuntut fondasi kritis sejak dini agar generasi muda menjadi produsen pengetahuan." category="Sains & Teknologi" date="4 Ags 2026"
-                authors="Dr. Ahmad Subagyo" slug="literasi-digital-gen-z" />
-
-            <x-article-card title="Strategi Penerbitan Akademik Berstandar Internasional Bagi Peneliti Muda"
-                abstract="Langkah praktis menyusun naskah ilmiah, memilih jurnal bereputasi, dan menghindari perangkap jurnal predator." category="Pendidikan" date="3 Ags 2026"
-                authors="Prof. Dewi Lestari" slug="strategi-penerbitan-akademik" />
-
-            <x-article-card title="Menjaga Keberagaman Budaya Lokal Melalui Digitalisasi Naskah Kuno"
-                abstract="Upaya penyelamatan naskah Nusantara melalui teknik pemindaian tinggi dan pengarsipan digital berbasis sains." category="Kebudayaan" date="1 Ags 2026"
-                authors="Budi Santoso, M.Hum" slug="digitalisasi-naskah-kuno" />
+            @forelse ($articles as $index => $article)
+                <x-article-card 
+                    :title="$article->title"
+                    :abstract="$article->abstract"
+                    :category="$article->category"
+                    :date="$article->published_date ? $article->published_date->translatedFormat('j M Y') : ''"
+                    :authors="$article->authors"
+                    :slug="$article->slug"
+                />
+            @empty
+                <div class="p-8 text-center text-slate-500 bg-white/50 rounded-2xl border border-slate-100">
+                    Tidak ditemukan artikel yang sesuai dengan kriteria pencarian.
+                </div>
+            @endforelse
         </div>
 
-        <!-- Pagination Placeholder -->
-        <div class="mt-12 flex items-center justify-center gap-2">
-            <button disabled class="cursor-not-allowed rounded-lg border border-slate-300 px-3.5 py-1.5 text-xs text-slate-400 opacity-50">
-                &laquo; Sebelumnya
-            </button>
-            <span class="rounded-lg bg-orange-600 px-3.5 py-1.5 text-xs font-bold text-white">1</span>
-            <button class="rounded-lg border border-slate-300 px-3.5 py-1.5 text-xs text-slate-700 hover:bg-white/80">2</button>
-            <button class="rounded-lg border border-slate-300 px-3.5 py-1.5 text-xs text-slate-700 hover:bg-white/80">
-                Berikutnya &raquo;
-            </button>
+        <!-- Pagination -->
+        <div class="mt-12 flex items-center justify-center">
+            {{ $articles->links() }}
         </div>
     </section>
 </x-app-layout>

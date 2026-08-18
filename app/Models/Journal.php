@@ -9,6 +9,8 @@ class Journal extends Model
 {
     use HasFactory;
 
+    protected $connection = 'loa';
+
     protected $fillable = [
         'name',
         'slug',
@@ -19,4 +21,14 @@ class Journal extends Model
         'ojs_base_url',
         'ojs_secret_key',
     ];
+
+    public function save(array $options = [])
+    {
+        throw new \Exception('Model Journal is read-only in Repository.');
+    }
+
+    public function delete()
+    {
+        throw new \Exception('Model Journal is read-only in Repository.');
+    }
 }

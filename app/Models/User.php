@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -15,14 +14,20 @@ use Spatie\Permission\Traits\HasRoles;
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasRoles;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    protected $connection = 'loa';
+
+    public function save(array $options = [])
+    {
+        throw new \Exception('Model User is read-only in Repository.');
+    }
+
+    public function delete()
+    {
+        throw new \Exception('Model User is read-only in Repository.');
+    }
+
     protected function casts(): array
     {
         return [

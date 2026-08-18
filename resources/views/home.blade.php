@@ -79,29 +79,22 @@
         </div>
 
         <div class="flex flex-col space-y-4">
-            <div class="reveal delay-100">
-                <x-article-card title="Transformasi Kurikulum Digital dalam Mengakselerasi Mutu Pendidikan Indonesia"
-                    abstract="Sebuah tinjauan komprehensif mengenai penerapan kurikulum berbasis teknologi dan tantangan pemerataan infrastruktur sekolah." category="Pendidikan" date="5 Ags 2026"
-                    authors="Dr. Raden Haryo" slug="transformasi-kurikulum-digital" />
-            </div>
-
-            <div class="reveal delay-200">
-                <x-article-card title="Pentingnya Penguatan Literasi Digital Pada Generasi Z di Era GenAI"
-                    abstract="Perkembangan AI generatif menuntut fondasi kritis sejak dini agar generasi muda menjadi produsen pengetahuan." category="Sains & Teknologi" date="4 Ags 2026"
-                    authors="Dr. Ahmad Subagyo" slug="literasi-digital-gen-z" />
-            </div>
-
-            <div class="reveal delay-300">
-                <x-article-card title="Strategi Penerbitan Akademik Berstandar Internasional Bagi Peneliti Muda"
-                    abstract="Langkah praktis menyusun naskah ilmiah, memilih jurnal bereputasi, dan menghindari perangkap jurnal predator." category="Pendidikan" date="3 Ags 2026"
-                    authors="Prof. Dewi Lestari" slug="strategi-penerbitan-akademik" />
-            </div>
-
-            <div class="reveal delay-400">
-                <x-article-card title="Menjaga Keberagaman Budaya Lokal Melalui Digitalisasi Naskah Kuno"
-                    abstract="Upaya penyelamatan naskah Nusantara melalui teknik pemindaian tinggi dan pengarsipan digital berbasis sains." category="Kebudayaan" date="1 Ags 2026"
-                    authors="Budi Santoso, M.Hum" slug="digitalisasi-naskah-kuno" />
-            </div>
+            @forelse ($articles as $index => $article)
+                <div class="reveal delay-{{ ($index + 1) * 100 }}">
+                    <x-article-card 
+                        :title="$article->title"
+                        :abstract="$article->abstract"
+                        :category="$article->category"
+                        :date="$article->published_date ? $article->published_date->translatedFormat('j M Y') : ''"
+                        :authors="$article->authors"
+                        :slug="$article->slug"
+                    />
+                </div>
+            @empty
+                <div class="p-8 text-center text-slate-500 bg-white/50 rounded-2xl border border-slate-100">
+                    Belum ada artikel yang dipublikasikan.
+                </div>
+            @endforelse
         </div>
     </section>
 
