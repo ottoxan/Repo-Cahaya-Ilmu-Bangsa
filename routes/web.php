@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Article;
 use App\Models\ArticleView;
 use App\Models\DownloadLog;
+use App\Models\Submission;
 use Illuminate\Http\Request;
 
 Route::get('/', function () {
@@ -12,7 +13,24 @@ Route::get('/', function () {
         ->latest('published_date')
         ->take(6)
         ->get();
-    return view('home', compact('articles'));
+
+    $submissions = Submission::with('journal')
+        ->where('status', 'Approved')
+        ->where('ojs_status', 'submitted')
+        ->latest('approved_date')
+        ->take(6)
+        ->get();
+
+    // Merge and sort in PHP
+    $merged = collect()
+        ->merge($articles)
+        ->merge($submissions)
+        ->sortByDesc(function ($item) {
+            return $item->published_date ? $item->published_date->timestamp : 0;
+        })
+        ->take(6);
+
+    return view('home', ['articles' => $merged]);
 })->name('home');
 
 Route::get('/search', function (Request $request) {
@@ -20,6 +38,7 @@ Route::get('/search', function (Request $request) {
     $category = $request->query('category');
     $journalId = $request->query('journal_id');
 
+    // 1. Query Articles
     $articlesQuery = Article::with('journal')
         ->where('status', 'published');
 
@@ -40,14 +59,112 @@ Route::get('/search', function (Request $request) {
         $articlesQuery->where('journal_id', $journalId);
     }
 
-    $articles = $articlesQuery->latest('published_date')->paginate(10)->withQueryString();
+    $articles = $articlesQuery->get();
 
-    return view('search', compact('articles', 'query', 'category', 'journalId'));
+    // 2. Query Submissions
+    $submissionsQuery = Submission::with('journal')
+        ->where('status', 'Approved')
+        ->where('ojs_status', 'submitted');
+
+    if (!empty($query)) {
+        $submissionsQuery->where(function ($q) use ($query) {
+            $q->where('title', 'like', '%' . $query . '%')
+              ->orWhere('abstract', 'like', '%' . $query . '%')
+              ->orWhere('keywords', 'like', '%' . $query . '%')
+              ->orWhere('author_name', 'like', '%' . $query . '%');
+        });
+    }
+
+    if (!empty($journalId)) {
+        $submissionsQuery->where('journal_id', $journalId);
+    }
+
+    $submissions = $submissionsQuery->get();
+
+    // Filter submissions by category in PHP since category is an accessor
+    if (!empty($category)) {
+        $submissions = $submissions->filter(function ($sub) use ($category) {
+            return $sub->category === $category;
+        });
+    }
+
+    // Merge and Sort
+    $merged = collect()
+        ->merge($articles)
+        ->merge($submissions)
+        ->sortByDesc(function ($item) {
+            return $item->published_date ? $item->published_date->timestamp : 0;
+        });
+
+    // Paginate manually using LengthAwarePaginator
+    $perPage = 10;
+    $currentPage = request()->get('page', 1);
+    $currentPageItems = $merged->slice(($currentPage - 1) * $perPage, $perPage)->values();
+    
+    $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
+        $currentPageItems,
+        $merged->count(),
+        $perPage,
+        $currentPage,
+        [
+            'path' => request()->url(),
+            'query' => request()->query(),
+        ]
+    );
+
+    return view('search', ['articles' => $paginated, 'query' => $query, 'category' => $category, 'journalId' => $journalId]);
 })->name('search');
 
 Route::get('/article/{slug?}', function ($slug = null) {
     if (empty($slug)) {
         return redirect()->route('home');
+    }
+
+    $isSubmission = str_starts_with($slug, 'submission-');
+
+    if ($isSubmission) {
+        $id = (int) str_replace('submission-', '', $slug);
+        $submission = Submission::with('journal')->findOrFail($id);
+
+        $keywords = $submission->keywords ?? '';
+        $keywordsList = array_values(array_filter(array_map('trim', preg_split('/[;,]/', $keywords))));
+        $tags = array_map(fn($kw) => '#' . str_replace(' ', '', $kw), $keywordsList);
+
+        $loaUrl = env('LOA_URL', 'http://127.0.0.1:8000');
+        $pdfFileUrl = $loaUrl . '/storage/' . $submission->manuscript_file;
+
+        $articleData = [
+            'id' => $submission->id,
+            'title' => $submission->title,
+            'abstract' => $submission->abstract,
+            'authors' => $submission->authors,
+            'author_institution' => '',
+            'author_institutions' => [],
+            'keywords' => $submission->keywords,
+            'category' => $submission->category,
+            'date_formatted' => $submission->published_date ? $submission->published_date->translatedFormat('j F Y') : '',
+            'date' => $submission->published_date ? $submission->published_date->format('Y/m/d') : '',
+            'year' => $submission->published_date ? $submission->published_date->format('Y') : '',
+            'doi_url' => null,
+            'pdf_url' => route('article.download', ['slug' => $slug]),
+            'pdf_preview_url' => $pdfFileUrl,
+            'journal_url' => $submission->publication_link ?: ($submission->journal?->link ?? '#'),
+            'journal' => $submission->journal?->name ?? 'Jurnal',
+            'volume' => $submission->volume ?? '',
+            'issue' => '',
+            'pages' => '',
+            'language' => 'id',
+            'language_name' => 'Indonesia (id)',
+            'indexing' => ['OpenAIRE', 'Zenodo', 'Google Scholar'],
+            'publisher' => 'Cahaya Ilmu Bangsa',
+            'doi' => '',
+            'references' => $submission->references ?? '',
+            'tags' => $tags,
+            'license' => 'Open Access (CC BY 4.0)',
+            'journal_id' => $submission->journal_id,
+        ];
+
+        return view('articles.show', ['article' => $articleData]);
     }
 
     $articleModel = Article::where('slug', $slug)->firstOrFail();
@@ -82,6 +199,16 @@ Route::get('/article/{slug?}', function ($slug = null) {
 })->name('article.show');
 
 Route::get('/article/{slug}/download', function ($slug) {
+    $isSubmission = str_starts_with($slug, 'submission-');
+
+    if ($isSubmission) {
+        $id = (int) str_replace('submission-', '', $slug);
+        $submission = Submission::findOrFail($id);
+
+        $loaUrl = env('LOA_URL', 'http://127.0.0.1:8000');
+        return redirect($loaUrl . '/storage/' . $submission->manuscript_file);
+    }
+
     $articleModel = Article::where('slug', $slug)->firstOrFail();
 
     // Log the download statistic

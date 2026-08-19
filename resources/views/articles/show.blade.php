@@ -35,8 +35,6 @@ if (!isset($article)) {
         'references' =>
             "Cruse, A. (2000). Meaning in Language: An Introduction to Semantics and Pragmatics. Oxford University Press. https://doi.org/10.1515/9783110226614.74\nHurford R., J., Heasley, B., & Smith B., M. (2007). Semantics: A Coursebook. Cambridge University Press.\nIstama, N. R., Al-Anwar, S. F., & Aidil Syah Putra. (2024). Semantic Analysis of Metaphors of Selected James Arthur'S Song. English Teaching Journal and Research: Journal of English Education, Literature, And Linguistics, 4(2), 32–46. https://doi.org/10.55148/etjar.v4i2.1139\nKendong, F. A., Daud, A. S., Joharry, S. A., & Mcgraw, T. (2023). A Corpus- driven Analysis of Taylor Swift ' s Song Lyrics Taylor Swift ' s song lyrics as a specialised corpus Teardrops on My Guitar. International Journal of Modern Languages and Applied Linguistics, 7(2), 59–82. https://ir.uitm.edu.my/id/eprint/83439\nLakoff, G., & Johnson, M. (2003). Metaphors We Live By.pdf (p. 129).\nLeech, G. (1981). Semantics: The Study of Meaning Second edition - revised and updated. 388.\nLyons, J. (1977). Semantics 1. Cambridge University Press.\nNilsen, D. L. F., & Palmer, F. R. (1976). Semantics: Second edition. In The Modern Language Journal (Vol. 60, Issue 7, p. 414). https://doi.org/10.2307/324444\nSandelowski, M. (2000). Focus on research methods: Whatever happened to qualitative description? Research in Nursing and Health, 23(4), 334–340. https://doi.org/10.1002/1098-240x(200008)23:4<334::aid-nur9>3.0.co;2-g\nWierzbicka, A. (1990). The meaning of color terms: Semantics, culture, and cognition. Cognitive Linguistics, 1(1), 99–150. https://doi.org/10.1515/cogl.1990.1.1.99",
     ];
-
-    ];
 }
 
     // Fetch Journal model dynamically based on journal_id
@@ -78,19 +76,33 @@ if (!isset($article)) {
     // Split keywords string into array of individual keywords
     $keywordsList = is_array($article['keywords'] ?? null) ? $article['keywords'] : array_values(array_filter(array_map('trim', preg_split('/[;,]/', (string) ($article['keywords'] ?? '')))));
 
-    $apaCitation = "{$citationAuthors} ({$article['year']}). {$article['title']}. {$journalName}, {$article['volume']}({$article['issue']}). {$article['doi_url']}";
-    $ieeeCitation = "{$ieeeAuthors}, \"{$article['title']},\" {$journalName}, vol. {$article['volume']}, no. {$article['issue']}, {$article['year']}, doi: {$article['doi']}.";
-    $harvardCitation = "{$citationAuthors}, {$article['year']}. {$article['title']}. {$journalName}, {$article['volume']}({$article['issue']}). Available at: <{$article['doi_url']}>.";
+    $apaCitation = $citationAuthors . " (" . $article['year'] . "). " . $article['title'] . ". " . $journalName . ", " . $article['volume'] . "(" . $article['issue'] . "). " . $article['doi_url'];
+    $ieeeCitation = $ieeeAuthors . ", \"" . $article['title'] . ",\" " . $journalName . ", vol. " . $article['volume'] . ", no. " . $article['issue'] . ", " . $article['year'] . ", doi: " . ($article['doi'] ?? '') . ".";
+    $harvardCitation = $citationAuthors . ", " . $article['year'] . ". " . $article['title'] . ". " . $journalName . ", " . $article['volume'] . "(" . $article['issue'] . "). Available at: <" . $article['doi_url'] . ">.";
 
     $bibtexCitation =
-        "@article{oktavia{$article['year']}pengaruh,\n  title={{ $article['title'] }},\n  author={" .
-        implode(' and ', $article['authors']) .
-        "},\n  journal={{ $journalName }},\n  volume={{ $article['volume'] }},\n  number={{ $article['issue'] }},\n  year={{ $article['year'] }},\n  publisher={{ $article['publisher'] }},\n  doi={{ $article['doi'] }}\n}";
+        "@article{oktavia" . $article['year'] . "pengaruh,\n" .
+        "  title={{ " . $article['title'] . " }},\n" .
+        "  author={" . implode(' and ', $article['authors']) . "},\n" .
+        "  journal={{ " . $journalName . " }},\n" .
+        "  volume={{ " . $article['volume'] . " }},\n" .
+        "  number={{ " . $article['issue'] . " }},\n" .
+        "  year={{ " . $article['year'] . " }},\n" .
+        "  publisher={{ " . ($article['publisher'] ?? '') . " }},\n" .
+        "  doi={{ " . ($article['doi'] ?? '') . " }}\n" .
+        "}";
 
     $risCitation =
-        "TY  - JOUR\nTI  - {$article['title']}\n" .
-        implode("\n", array_map(fn($a) => "AU  - {$a}", $article['authors'])) .
-        "\nJO  - {$journalName}\nVL  - {$article['volume']}\nIS  - {$article['issue']}\nPY  - {$article['year']}\nPB  - {$article['publisher']}\nDO  - {$article['doi']}\nER  -";
+        "TY  - JOUR\n" .
+        "TI  - " . $article['title'] . "\n" .
+        implode("\n", array_map(fn($a) => "AU  - " . $a, $article['authors'])) . "\n" .
+        "JO  - " . $journalName . "\n" .
+        "VL  - " . $article['volume'] . "\n" .
+        "IS  - " . $article['issue'] . "\n" .
+        "PY  - " . $article['year'] . "\n" .
+        "PB  - " . ($article['publisher'] ?? '') . "\n" .
+        "DO  - " . ($article['doi'] ?? '') . "\n" .
+        "ER  -";
 
 @endphp
 

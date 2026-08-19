@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+use App\Models\Submission;
 use App\Models\Journal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
@@ -73,15 +74,21 @@ class OaiPmhController extends Controller
                 }
 
                 $articlesQuery = Article::with('journal')->where('status', 'published');
+                $submissionsQuery = Submission::with('journal')->where('status', 'Approved')->where('ojs_status', 'submitted');
                 if ($set) {
                     $journal = Journal::where('slug', $set)->first();
                     if ($journal) {
                         $articlesQuery->where('journal_id', $journal->id);
+                        $submissionsQuery->where('journal_id', $journal->id);
                     }
                 }
 
                 $articles = $articlesQuery->get();
-                if ($articles->isEmpty()) {
+                $submissions = $submissionsQuery->get();
+                
+                $records = collect()->merge($articles)->merge($submissions);
+
+                if ($records->isEmpty()) {
                     $error = $xml->addChild('error', 'No records found.');
                     $error->addAttribute('code', 'noRecordsMatch');
                     break;
@@ -89,15 +96,19 @@ class OaiPmhController extends Controller
 
                 $verbNode = $xml->addChild($verb);
 
-                foreach ($articles as $article) {
+                foreach ($records as $item) {
                     $recordNode = $verbNode->addChild('record');
+                    
+                    $isSub = ($item instanceof Submission);
+                    $identifierVal = 'oai:repo.cib.institute:' . ($isSub ? 'submission-' . $item->id : $item->id);
+                    $datestampVal = $item->updated_at ? $item->updated_at->toIso8601String() : now()->toIso8601String();
                     
                     // Header
                     $header = $recordNode->addChild('header');
-                    $header->addChild('identifier', 'oai:repo.cib.institute:' . $article->id);
-                    $header->addChild('datestamp', $article->updated_at->toIso8601String());
-                    if ($article->journal) {
-                        $header->addChild('setSpec', $article->journal->slug);
+                    $header->addChild('identifier', $identifierVal);
+                    $header->addChild('datestamp', $datestampVal);
+                    if ($item->journal) {
+                        $header->addChild('setSpec', $item->journal->slug);
                     }
 
                     if ($verb === 'ListRecords') {
@@ -111,23 +122,23 @@ class OaiPmhController extends Controller
                         $dcNode->addAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
                         $dcNode->addAttribute('xsi:schemaLocation', 'http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd');
 
-                        $dcNode->addChild('dc:title', htmlspecialchars($article->title), 'http://purl.org/dc/elements/1.1/');
+                        $dcNode->addChild('dc:title', htmlspecialchars($item->title), 'http://purl.org/dc/elements/1.1/');
                         
-                        $authors = $article->authors ?? [];
+                        $authors = $item->authors ?? [];
                         foreach ($authors as $author) {
                             $dcNode->addChild('dc:creator', htmlspecialchars($author), 'http://purl.org/dc/elements/1.1/');
                         }
 
-                        $dcNode->addChild('dc:subject', htmlspecialchars($article->keywords), 'http://purl.org/dc/elements/1.1/');
-                        $dcNode->addChild('dc:description', htmlspecialchars($article->abstract), 'http://purl.org/dc/elements/1.1/');
-                        $dcNode->addChild('dc:publisher', htmlspecialchars($article->publisher), 'http://purl.org/dc/elements/1.1/');
-                        $dcNode->addChild('dc:date', $article->published_date ? $article->published_date->format('Y-m-d') : '', 'http://purl.org/dc/elements/1.1/');
+                        $dcNode->addChild('dc:subject', htmlspecialchars($item->keywords), 'http://purl.org/dc/elements/1.1/');
+                        $dcNode->addChild('dc:description', htmlspecialchars($item->abstract), 'http://purl.org/dc/elements/1.1/');
+                        $dcNode->addChild('dc:publisher', htmlspecialchars($isSub ? ($item->journal?->name ?? 'Cahaya Ilmu Bangsa') : $item->publisher), 'http://purl.org/dc/elements/1.1/');
+                        $dcNode->addChild('dc:date', $item->published_date ? $item->published_date->format('Y-m-d') : '', 'http://purl.org/dc/elements/1.1/');
                         $dcNode->addChild('dc:type', 'Text', 'http://purl.org/dc/elements/1.1/');
                         $dcNode->addChild('dc:format', 'application/pdf', 'http://purl.org/dc/elements/1.1/');
-                        $dcNode->addChild('dc:identifier', route('article.show', ['slug' => $article->slug]), 'http://purl.org/dc/elements/1.1/');
+                        $dcNode->addChild('dc:identifier', route('article.show', ['slug' => $item->slug]), 'http://purl.org/dc/elements/1.1/');
                         
-                        if ($article->doi) {
-                            $dcNode->addChild('dc:identifier', $article->doi_url, 'http://purl.org/dc/elements/1.1/');
+                        if (!$isSub && $item->doi) {
+                            $dcNode->addChild('dc:identifier', $item->doi_url, 'http://purl.org/dc/elements/1.1/');
                         }
                     }
                 }
@@ -149,22 +160,37 @@ class OaiPmhController extends Controller
                 $parts = explode(':', $identifier);
                 $id = end($parts);
 
-                $article = Article::with('journal')->find($id);
-                if (!$article || $article->status !== 'published') {
-                    $error = $xml->addChild('error', 'The identifier is not valid.');
-                    $error->addAttribute('code', 'idDoesNotExist');
-                    break;
+                $isSub = str_starts_with($id, 'submission-');
+
+                if ($isSub) {
+                    $realId = (int) str_replace('submission-', '', $id);
+                    $item = Submission::with('journal')->find($realId);
+                    if (!$item || $item->status !== 'Approved' || $item->ojs_status !== 'submitted') {
+                        $error = $xml->addChild('error', 'The identifier is not valid.');
+                        $error->addAttribute('code', 'idDoesNotExist');
+                        break;
+                    }
+                } else {
+                    $item = Article::with('journal')->find($id);
+                    if (!$item || $item->status !== 'published') {
+                        $error = $xml->addChild('error', 'The identifier is not valid.');
+                        $error->addAttribute('code', 'idDoesNotExist');
+                        break;
+                    }
                 }
 
                 $getRecordNode = $xml->addChild('GetRecord');
                 $recordNode = $getRecordNode->addChild('record');
                 
+                $identifierVal = 'oai:repo.cib.institute:' . ($isSub ? 'submission-' . $item->id : $item->id);
+                $datestampVal = $item->updated_at ? $item->updated_at->toIso8601String() : now()->toIso8601String();
+
                 // Header
                 $header = $recordNode->addChild('header');
-                $header->addChild('identifier', 'oai:repo.cib.institute:' . $article->id);
-                $header->addChild('datestamp', $article->updated_at->toIso8601String());
-                if ($article->journal) {
-                    $header->addChild('setSpec', $article->journal->slug);
+                $header->addChild('identifier', $identifierVal);
+                $header->addChild('datestamp', $datestampVal);
+                if ($item->journal) {
+                    $header->addChild('setSpec', $item->journal->slug);
                 }
 
                 // Metadata
@@ -177,23 +203,23 @@ class OaiPmhController extends Controller
                 $dcNode->addAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
                 $dcNode->addAttribute('xsi:schemaLocation', 'http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd');
 
-                $dcNode->addChild('dc:title', htmlspecialchars($article->title), 'http://purl.org/dc/elements/1.1/');
+                $dcNode->addChild('dc:title', htmlspecialchars($item->title), 'http://purl.org/dc/elements/1.1/');
                 
-                $authors = $article->authors ?? [];
+                $authors = $item->authors ?? [];
                 foreach ($authors as $author) {
                     $dcNode->addChild('dc:creator', htmlspecialchars($author), 'http://purl.org/dc/elements/1.1/');
                 }
 
-                $dcNode->addChild('dc:subject', htmlspecialchars($article->keywords), 'http://purl.org/dc/elements/1.1/');
-                $dcNode->addChild('dc:description', htmlspecialchars($article->abstract), 'http://purl.org/dc/elements/1.1/');
-                $dcNode->addChild('dc:publisher', htmlspecialchars($article->publisher), 'http://purl.org/dc/elements/1.1/');
-                $dcNode->addChild('dc:date', $article->published_date ? $article->published_date->format('Y-m-d') : '', 'http://purl.org/dc/elements/1.1/');
+                $dcNode->addChild('dc:subject', htmlspecialchars($item->keywords), 'http://purl.org/dc/elements/1.1/');
+                $dcNode->addChild('dc:description', htmlspecialchars($item->abstract), 'http://purl.org/dc/elements/1.1/');
+                $dcNode->addChild('dc:publisher', htmlspecialchars($isSub ? ($item->journal?->name ?? 'Cahaya Ilmu Bangsa') : $item->publisher), 'http://purl.org/dc/elements/1.1/');
+                $dcNode->addChild('dc:date', $item->published_date ? $item->published_date->format('Y-m-d') : '', 'http://purl.org/dc/elements/1.1/');
                 $dcNode->addChild('dc:type', 'Text', 'http://purl.org/dc/elements/1.1/');
                 $dcNode->addChild('dc:format', 'application/pdf', 'http://purl.org/dc/elements/1.1/');
-                $dcNode->addChild('dc:identifier', route('article.show', ['slug' => $article->slug]), 'http://purl.org/dc/elements/1.1/');
+                $dcNode->addChild('dc:identifier', route('article.show', ['slug' => $item->slug]), 'http://purl.org/dc/elements/1.1/');
                 
-                if ($article->doi) {
-                    $dcNode->addChild('dc:identifier', $article->doi_url, 'http://purl.org/dc/elements/1.1/');
+                if (!$isSub && $item->doi) {
+                    $dcNode->addChild('dc:identifier', $item->doi_url, 'http://purl.org/dc/elements/1.1/');
                 }
                 break;
 

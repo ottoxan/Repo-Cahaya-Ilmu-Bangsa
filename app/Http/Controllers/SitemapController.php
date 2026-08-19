@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+use App\Models\Submission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 
@@ -33,6 +34,20 @@ class SitemapController extends Controller
             $url = $xml->addChild('url');
             $url->addChild('loc', route('article.show', ['slug' => $article->slug]));
             $url->addChild('lastmod', $article->updated_at->toIso8601String());
+            $url->addChild('changefreq', 'monthly');
+            $url->addChild('priority', '0.6');
+        }
+
+        // Add submissions
+        $submissions = Submission::where('status', 'Approved')
+            ->where('ojs_status', 'submitted')
+            ->latest('approved_date')
+            ->get();
+
+        foreach ($submissions as $submission) {
+            $url = $xml->addChild('url');
+            $url->addChild('loc', route('article.show', ['slug' => 'submission-' . $submission->id]));
+            $url->addChild('lastmod', $submission->updated_at ? $submission->updated_at->toIso8601String() : now()->toIso8601String());
             $url->addChild('changefreq', 'monthly');
             $url->addChild('priority', '0.6');
         }
