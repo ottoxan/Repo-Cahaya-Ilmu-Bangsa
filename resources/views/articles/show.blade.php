@@ -82,14 +82,14 @@ if (!isset($article)) {
 
     $bibtexCitation =
         "@article{oktavia" . $article['year'] . "pengaruh,\n" .
-        "  title={{ " . $article['title'] . " }},\n" .
+        "  title={" . "{" . $article['title'] . "}" . "},\n" .
         "  author={" . implode(' and ', $article['authors']) . "},\n" .
-        "  journal={{ " . $journalName . " }},\n" .
-        "  volume={{ " . $article['volume'] . " }},\n" .
-        "  number={{ " . $article['issue'] . " }},\n" .
-        "  year={{ " . $article['year'] . " }},\n" .
-        "  publisher={{ " . ($article['publisher'] ?? '') . " }},\n" .
-        "  doi={{ " . ($article['doi'] ?? '') . " }}\n" .
+        "  journal={" . "{" . $journalName . "}" . "},\n" .
+        "  volume={" . "{" . $article['volume'] . "}" . "},\n" .
+        "  number={" . "{" . $article['issue'] . "}" . "},\n" .
+        "  year={" . "{" . $article['year'] . "}" . "},\n" .
+        "  publisher={" . "{" . ($article['publisher'] ?? '') . "}" . "},\n" .
+        "  doi={" . "{" . ($article['doi'] ?? '') . "}" . "}\n" .
         "}";
 
     $risCitation =
