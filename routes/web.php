@@ -133,6 +133,14 @@ Route::get('/article/{slug?}', function ($slug = null) {
         $loaUrl = env('LOA_URL', 'http://127.0.0.1:8000');
         $pdfFileUrl = $loaUrl . '/storage/' . $submission->manuscript_file;
 
+        $volumeStr = $submission->volume ?? '';
+        $volumeNum = $volumeStr;
+        $issueNum = '';
+        if (preg_match('/Vol\\.?\\s*(\\d+)\\s*,?\\s*No\\.?\\s*(\\d+)/i', $volumeStr, $matches)) {
+            $volumeNum = $matches[1];
+            $issueNum = $matches[2];
+        }
+
         $articleData = [
             'id' => $submission->id,
             'title' => $submission->title,
@@ -150,8 +158,8 @@ Route::get('/article/{slug?}', function ($slug = null) {
             'pdf_preview_url' => $pdfFileUrl,
             'journal_url' => $submission->publication_link ?: ($submission->journal?->link ?? '#'),
             'journal' => $submission->journal?->name ?? 'Jurnal',
-            'volume' => $submission->volume ?? '',
-            'issue' => '',
+            'volume' => $volumeNum,
+            'issue' => $issueNum,
             'pages' => '',
             'language' => 'id',
             'language_name' => 'Indonesia (id)',
@@ -184,6 +192,17 @@ Route::get('/article/{slug?}', function ($slug = null) {
     $articleData = $articleModel->toArray();
     $articleData['doi_url'] = $articleModel->doi_url;
     $articleData['pdf_url'] = route('article.download', ['slug' => $articleModel->slug]);
+
+    // Parse volume/issue if they are stored as a combined string
+    $volumeStr = $articleModel->volume ?? '';
+    $volumeNum = $volumeStr;
+    $issueNum = $articleModel->issue ?? '';
+    if (preg_match('/Vol\\.?\\s*(\\d+)\\s*,?\\s*No\\.?\\s*(\\d+)/i', $volumeStr, $matches)) {
+        $volumeNum = $matches[1];
+        $issueNum = $matches[2];
+    }
+    $articleData['volume'] = $volumeNum;
+    $articleData['issue'] = $issueNum;
     $articleData['date_formatted'] = $articleModel->published_date ? $articleModel->published_date->translatedFormat('j F Y') : '';
     $articleData['date'] = $articleModel->published_date ? $articleModel->published_date->format('Y/m/d') : '';
     $articleData['year'] = $articleModel->published_date ? $articleModel->published_date->format('Y') : '';

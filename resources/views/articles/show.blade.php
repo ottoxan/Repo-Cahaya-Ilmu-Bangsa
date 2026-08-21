@@ -122,7 +122,7 @@ if (!isset($article)) {
                 <meta name="citation_author_institution" content="{{ $article['author_institution'] }}">
             @endif
         @endforeach
-        <meta name="citation_publication_date" content="{{ $article['date'] }}">
+        <meta name="citation_date" content="{{ $article['date'] }}">
         <meta name="citation_journal_title" content="{{ $journalName }}">
         <meta name="citation_publisher" content="{{ $article['publisher'] }}">
         <meta name="citation_volume" content="{{ $article['volume'] }}">
