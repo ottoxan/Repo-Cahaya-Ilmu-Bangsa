@@ -124,7 +124,10 @@ Route::get('/article/{slug?}', function ($slug = null) {
 
     if ($isSubmission) {
         $id = (int) str_replace('submission-', '', $slug);
-        $submission = Submission::with('journal')->findOrFail($id);
+        $submission = Submission::with('journal')
+            ->where('status', 'Approved')
+            ->where('ojs_status', 'submitted')
+            ->findOrFail($id);
 
         $keywords = $submission->keywords ?? '';
         $keywordsList = array_values(array_filter(array_map('trim', preg_split('/[;,]/', $keywords))));
@@ -153,7 +156,7 @@ Route::get('/article/{slug?}', function ($slug = null) {
             'date_formatted' => $submission->published_date ? $submission->published_date->translatedFormat('j F Y') : '',
             'date' => $submission->published_date ? $submission->published_date->format('Y/m/d') : '',
             'year' => $submission->published_date ? $submission->published_date->format('Y') : '',
-            'doi_url' => null,
+            'doi_url' => $submission->repository_redirect_url,
             'pdf_url' => route('article.download', ['slug' => $slug]),
             'pdf_preview_url' => $pdfFileUrl,
             'journal_url' => $submission->publication_link ?: ($submission->journal?->link ?? '#'),
@@ -165,7 +168,7 @@ Route::get('/article/{slug?}', function ($slug = null) {
             'language_name' => 'Indonesia (id)',
             'indexing' => ['OpenAIRE', 'Zenodo', 'Google Scholar'],
             'publisher' => 'Cahaya Ilmu Bangsa',
-            'doi' => '',
+            'doi' => $submission->repository_identifier,
             'references' => $submission->references ?? '',
             'tags' => $tags,
             'license' => 'Open Access (CC BY 4.0)',
@@ -222,7 +225,9 @@ Route::get('/article/{slug}/download', function ($slug) {
 
     if ($isSubmission) {
         $id = (int) str_replace('submission-', '', $slug);
-        $submission = Submission::findOrFail($id);
+        $submission = Submission::where('status', 'Approved')
+            ->where('ojs_status', 'submitted')
+            ->findOrFail($id);
 
         $loaUrl = env('LOA_URL', 'http://127.0.0.1:8000');
         return redirect($loaUrl . '/storage/' . $submission->manuscript_file);
@@ -423,3 +428,15 @@ Route::post('/sso/local-check', function () {
         'logged_in' => \Illuminate\Support\Facades\Auth::check()
     ]);
 })->name('sso.local-check');
+
+
+// Repository Identifier (DOI Custom) Redirection Route
+Route::get('/{identifier}', function ($identifier) {
+    $submission = \App\Models\Submission::where('repository_identifier', $identifier)->first();
+    
+    if ($submission && !empty($submission->repository_landing_page)) {
+        return redirect($submission->repository_landing_page, 301);
+    }
+    
+    abort(404);
+})->where('identifier', '^[A-Za-z0-9]+-\\d{4}-\\d+$');

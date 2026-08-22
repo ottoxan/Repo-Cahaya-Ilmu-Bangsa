@@ -386,10 +386,12 @@ if (!isset($article)) {
                             <span class="mb-0.5 block text-slate-500">Bahasa:</span>
                             <span class="font-semibold text-slate-800">{{ $article['language_name'] }}</span>
                         </div>
+                        @if (!empty($article['doi']))
                         <div class="pt-2">
                             <span class="mb-0.5 block text-slate-500">Digital Object Identifier (DOI):</span>
                             <a href="{{ $article['doi_url'] }}" target="_blank" class="break-all font-mono font-bold text-orange-600 hover:underline">{{ $article['doi'] }}</a>
                         </div>
+                        @endif
                         <div class="pt-2">
                             <span class="mb-0.5 block text-slate-500">Lisensi Akses:</span>
                             <span class="mt-1 inline-block rounded border border-slate-200 bg-slate-100 px-2.5 py-1 font-semibold text-slate-700">
